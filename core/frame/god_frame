@@ -1,0 +1,139 @@
+<?php
+
+namespace core\frame;
+use core\frame\god_mvc;
+
+class god_frame {
+
+	public $prj_folder;
+	public $prj_main;
+	public $prj_dir = array(
+		'controller'=>'Controller',
+		'view' => 'View',
+		'public' => 'Public',
+		'core' => 'Core'
+	);
+
+	public function __construct($prj_name) {
+		$this->prj_folder = getcwd().'/'.$prj_name;
+		$this->prj_main = $this->prj_folder.'/index.php';
+	}
+
+	public function _create_tpl($fileName, $tplName, $prj_conf) {
+		// create conf
+		extract(get_object_vars($prj_conf));
+
+		$get_tpl = file_get_contents(dirname(__FILE__).'/template/'.$tplName);
+		$get_tpl = str_replace('!date', date('Y-m-d H:i:s'), $get_tpl);
+		$get_tpl = str_replace('!prjname', $prj_name, $get_tpl);
+		$get_tpl = str_replace('!prjauthor', $prj_author, $get_tpl);
+
+		if(file_exists($fileName)) {
+			echo 'warning: file '.$fileName.' already exists!'.PHP_EOL;
+			return;
+		}
+
+		if(!$get_tpl) {
+			die('error: invalid tpl'.$tplName);
+		} 
+
+		file_put_contents($fileName, $get_tpl);
+	}
+
+	// create project dirs and files
+	public function run($prj_conf) {
+		if(!file_exists($this->prj_folder)){
+			mkdir($this->prj_folder);
+			mkdir($this->prj_folder.'/'.$this->prj_dir['controller']);
+			mkdir($this->prj_folder.'/'.$this->prj_dir['view']);
+			mkdir($this->prj_folder.'/'.$this->prj_dir['public']);
+			mkdir($this->prj_folder.'/'.$this->prj_dir['public'].'/js');
+			mkdir($this->prj_folder.'/'.$this->prj_dir['core']);
+			mkdir($this->prj_folder.'/'.$this->prj_dir['core'].'/orm');
+		}
+
+		// create index.php
+		$this->_create_tpl($this->prj_main, 'index.tpl', $prj_conf);
+
+		// create start.php
+		$this->_create_tpl($this->prj_folder.'/'.$this->prj_dir['core'].'/start.php', 'start.tpl', $prj_conf);
+
+		// create lib_param.php
+		$this->_create_tpl($this->prj_folder.'/'.$this->prj_dir['core'].'/lib_param.php', 'lib_param.tpl', $prj_conf);
+
+		// create test.class.php
+		$this->_create_tpl($this->prj_folder.'/'.$this->prj_dir['controller'].'/test.class.php', 'test.class.tpl', $prj_conf);
+
+		// create test.func.php
+		$this->_create_tpl($this->prj_folder.'/'.$this->prj_dir['controller'].'/test.func.php', 'test.func.tpl', $prj_conf);
+
+		// create test.var.php
+		$this->_create_tpl($this->prj_folder.'/'.$this->prj_dir['controller'].'/test.var.php', 'test.var.tpl', $prj_conf);
+
+		// create jq.js
+		$this->_create_tpl($this->prj_folder.'/'.$this->prj_dir['public'].'/js/jq.js', 'jq.tpl', $prj_conf);
+
+		// create test.tpl
+		$this->_create_tpl($this->prj_folder.'/'.$this->prj_dir['view'].'/test.tpl', 'test.tpl', $prj_conf);
+
+		// create orm.php
+		$this->_create_tpl($this->prj_folder.'/'.$this->prj_dir['core'].'/orm/orm.php', 'orm.tpl', $prj_conf);
+
+		//system('/usr/local/php/bin/php -S localhost:8081 -t /home/txl/txlPro');
+		echo 'make success!';
+
+	}
+
+	public function compile() {
+		$file_list = scandir($this->prj_folder.'/Controller');
+		//var_export($file_list);
+		foreach ($file_list as $file) {
+			if(preg_match('/\w+\.(var|func|class)\.php$/i', $file)) {
+				require $this->prj_folder.'/Controller/'.$file;
+			}
+		}
+
+		// vars
+		unset($file, $file_list);
+		$vars = '<?php'.PHP_EOL.
+				'// create date: '.date('Y-m-d H:i:s').PHP_EOL.
+				'extract('.var_export(get_defined_vars(), true).');';
+		if(file_put_contents($this->prj_folder.'/vars', $vars))
+			echo 'compile var success!'.PHP_EOL;
+
+		// functions
+		$functions = get_defined_functions()['user'];
+		$fc_content = '<?php'.PHP_EOL.
+					'// create date: '.date('Y-m-d H:i:s').PHP_EOL;
+		for($i=4; $i<count($functions); $i++) {
+			$rf = new \ReflectionFunction($functions[$i]);
+			$fc_path = $rf->getFileName();
+			$fc_start = $rf->getStartLine();
+			$fc_end = $rf->getEndLine();
+			$fc_file = array_slice(file($fc_path), $fc_start-1, $fc_end-$fc_start+1);
+
+			$fc_content.=implode($fc_file).PHP_EOL;
+		}
+		if(file_put_contents($this->prj_folder.'/functions', $fc_content))
+			echo 'compile functions success!'.PHP_EOL;
+
+		// classes
+		$classes = get_declared_classes();
+		$classes = array_slice($classes, array_search(__CLASS__, $classes)+1);
+		$controller_list = array();
+		foreach ($classes as $class) {
+			$god_mvc = new god_mvc($class);
+			if($god_mvc->isController()) {
+				$res = $god_mvc->getRequestMapping();
+				$controller_list = array_merge($controller_list, $res);
+			}
+		}
+		$cls_content = '<?php'.PHP_EOL.
+						'// create date: '.date('Y-m-d H:i:s').PHP_EOL.
+						'return '.var_export($controller_list,true).';';
+		if(file_put_contents($this->prj_folder.'/controller_route', $cls_content))
+			echo 'compile controller success!';
+	}
+
+
+}

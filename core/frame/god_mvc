@@ -1,0 +1,48 @@
+<?php
+namespace core\frame;
+
+class god_mvc {
+
+	public $class_name;
+	public $class_comment;
+	public $class_methods = array();
+
+	public function __construct($class_name) {
+		$this->class_name = $class_name;
+		$rfc = new \reflectionClass($class_name);
+		$this->class_comment = $rfc->getDocComment();
+		$this->class_methods = $rfc->getMethods();
+	}
+
+	public function isController() {
+		if(preg_match('/@Controller/', $this->class_comment)) {
+			return true;
+		}
+	}
+
+	// get all controller method
+	public function getRequestMapping() {
+		$array_list = array();
+		foreach ($this->class_methods as $method) {
+			$res = $this->genRequestMappingResult($method);
+			if($res) {
+				$array_list = array_merge($array_list, $res);
+			} 
+		}	
+		return $array_list;
+	}
+
+	// check 
+	private function genRequestMappingResult($method) {
+		$method_comment = $method->getDocComment();
+		$preg = '/@RequestMapping\("(?<request_url>.{3,50})",Method=(?<request_method>\w{3,10})\);/';
+		if(preg_match($preg, $method_comment, $res)) {
+			$return_array = array($res['request_url'] => array(
+				'request_method' => $res['request_method'],
+				'class_name' => $this->class_name,
+				'method_name' => $method->getName()
+			));
+			return $return_array;
+		}
+	} 
+}

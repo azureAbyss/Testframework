@@ -1,0 +1,61 @@
+<?php
+
+function init($str) {
+
+	/*$json_c = '{'; 
+	foreach ($arr as $k => $v) {
+		$json_c.='"'.$k.'"'.':"'.$v.'",';			
+	}
+	$json_c = substr($json_c, 0, -1);
+	$json_c.= '}'.PHP_EOL;*/
+
+	// ----------------------------------------------
+	// 1
+	$json_str = json_encode((object)$str);
+
+	// 2
+	// $json_str = new class($str) {
+	// 	public function __construct($str) {
+	// 		foreach ($str as $k => $v) {
+	// 			$this->$k = $v;
+	// 		}
+	// 	}
+		
+	// 	public function __toString() {
+	// 		if(!defined('CLS_STR') || 'json' == CLS_STR) 
+	// 			return json_encode($this);
+	// 	}
+	// };
+
+	// 3
+	/*$get_class = new stdClass();
+	foreach ($str as $k => $v) {
+		$get_class->$k = $v;
+	}
+	$json_str = json_encode($get_class);*/
+	// ----------------------------------------------
+
+	return file_put_contents(getcwd().'/god.json', $json_str).' of bytes written'.PHP_EOL.'god config is created';
+
+	
+}
+
+function get_ini($assoc = false) {
+	if(file_exists('god.json')) {
+		return $assoc ? json_decode(file_get_contents('god.json'),true) : json_decode(file_get_contents('god.json'));
+	} 
+	return false;
+}
+
+function get_ini_field($field) {
+	$get_class = get_ini();
+	if($get_class) {
+		return isset($get_class->$field) ? $get_class->$field : '-2';
+	}
+	return '-1';
+}
+
+function __autoload($class_name) {
+	$c_path = str_replace("\\", "/", $class_name);
+	require $c_path;
+}

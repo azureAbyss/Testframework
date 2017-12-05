@@ -1,0 +1,48 @@
+<?php
+
+namespace core;
+use core\frame\god_frame;
+
+
+class godinit {
+
+	public static $v = 'the god version is 1.0';
+	
+	public static function init() {
+		echo 'please input project name:'.PHP_EOL;
+		$prj_name = trim(fgets(STDIN));
+		echo 'please input project author:'.PHP_EOL;
+		$prj_author = trim(fgets(STDIN));
+		return init(array('prj_name'=>$prj_name,'prj_author'=>$prj_author));
+	}
+	
+	public static function ini() {
+		$get_ini = get_ini();
+		if(!$get_ini) exit('error:no such config file god.json!');
+		echo 'the god config:';
+		foreach ($get_ini as $k => $v) {
+			echo PHP_EOL.$k.': '.$v;
+		}
+	}
+
+	public static function make() {
+		$get_ini = get_ini();
+		if(!$get_ini) exit('error:no such config file god.json!');
+		if(!$get_ini->prj_name) exit('error:invalid field prj_name!');
+		$gf = new god_frame($get_ini->prj_name);
+		$gf->run($get_ini);
+
+	}
+
+	public static function compile() {
+		$get_ini = get_ini();
+		if(!$get_ini) exit('error:no such config file god.json!');
+		if(!$get_ini->prj_name) exit('error:invalid field prj_name!');
+		$gf = new god_frame($get_ini->prj_name);
+		$gf->compile();
+	}
+
+	public static function __callStatic($m, $args) {
+		return 'error:invalid method '.$m.'!';
+	}
+}
