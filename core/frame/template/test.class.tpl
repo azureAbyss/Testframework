@@ -7,7 +7,7 @@
 /**
  * @Controller
  */
-class user {
+class test {
 	/**
 	 * @RequestMapping("/member/(?<name>\w{2,10})/(?<age>\d+)$",Method=GET);
 	 */

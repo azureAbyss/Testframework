@@ -5,6 +5,6 @@
 // project author: !prjauthor
 
 // require('vars');
-// require('functions');
+require('functions');
 
 require 'Core/start.php';
