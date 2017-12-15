@@ -72,6 +72,7 @@
 ```
 /**
  * showUser()
+ * RequestMapping参数：(模板名称，View目录下.tpl后缀的文件, 自定义变量,数组格式，可在模板中使用)
  * @RequestMapping("/member/(?<name>\w{2,10})/(?<age>\d+)$",Method=GET);
  */
 function showUser($name, $age, $display) {
@@ -80,9 +81,6 @@ function showUser($name, $age, $display) {
     $display('tp1', $map);
 }
 ```
-参数：
-① 模板名称，为View目录下.tpl后缀的文件
-② 自定义变量,数组格式，可在模板中使用
 
 ## 未完成功能：
 1. 自定义ORM框架：Core/Orm/orm.php，目前只实现了简单的select、where、from的SQL语句拼接
