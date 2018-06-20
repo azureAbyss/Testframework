@@ -29,7 +29,7 @@
  */  
 ```
 4. **支持GET或POST方式的参数传入：**
-    * GET传入需要在方法上方的注解中加入相应的参数规则（必须使用别名，且只支持英文字母），并在方法参数中与之对应，如：
+    GET传入需要在方法上方的注解中加入相应的参数规则（必须使用别名，且只支持英文字母），并在方法参数中与之对应，如：
     ```
     /**
      * @RequestMapping("/member/(?<name>\w{2,10})/(?<age>\d+)$",Method=GET);
@@ -38,7 +38,7 @@
         echo 'name:'.$name.' age:'.$age;
     }
     ```
-    * POST传入只需在方法中添加与POST对应且参数名相同的参数即可（如果某个POST值不存在参数列表中，则不会传入）如：
+    POST传入只需在方法中添加与POST对应且参数名相同的参数即可（如果某个POST值不存在参数列表中，则不会传入）如：
     ```
     /**
      * userLoginCheck()
@@ -50,7 +50,7 @@
         echo json_encode($map);
     }
     ```
-    * 支持POST的自定义enctype格式（默认只支持application/json，其他类型可在start.php45行加入自定义解析规则），用其他MIME类型来取代默认的application/x-www-
+    支持POST的自定义enctype格式（默认只支持application/json，其他类型可在start.php45行加入自定义解析规则），用其他MIME类型来取代默认的application/x-www-
     form-urlencoded，如AJAX请求：
    ```
    $.ajax({
