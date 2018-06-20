@@ -1,5 +1,6 @@
 # v0.1
 PHP>=5.6
+
 更新时间：2017/12/5 10:54
 
 ## 主要命令：
@@ -10,9 +11,9 @@ PHP>=5.6
 * **god compile** 编译.func.php、.var.php、.class.php内容，前两者会在项目目录生成functions和vars文件，后者会生成controller_route的路由规则文件
 
 ## 主要功能：
-1. **创建基本MVC项目架构**
-2. **内置简单代码优化器，优化Controller文件夹下的xxx.var.php和xxx.func.php以及xxx.class.php**
-3. **实现简单的pathinfo路由，如果Controller文件夹下存在xxx.class.php，并在class声明上方标注：**
+**创建基本MVC项目架构**
+**内置简单代码优化器，优化Controller文件夹下的xxx.var.php和xxx.func.php以及xxx.class.php**
+**实现简单的pathinfo路由，如果Controller文件夹下存在xxx.class.php，并在class声明上方标注：**
 ```php
 /**
  * 如果在class声明上方标注，该类是一个控制器：
@@ -26,7 +27,7 @@ PHP>=5.6
  * @RequestMapping("/login$",Method=GET);
  */  
 ```
-4. **支持GET或POST方式的参数传入：**
+**支持GET或POST方式的参数传入：**
 
 GET传入需要在方法上方的注解中加入相应的参数规则（必须使用别名，且只支持英文字母），并在方法参数中与之对应，如：
 ```
@@ -67,7 +68,7 @@ $.ajax({
     }
 });
 ```
-5. **加载模板：在需要的控制器方法中添加参数$display即可调用模板，支持自定义传参，系统会自动加载vars和自定义变量，如：**
+**加载模板：在需要的控制器方法中添加参数$display即可调用模板，支持自定义传参，系统会自动加载vars和自定义变量，如：**
 ```
 /**
  * showUser()
