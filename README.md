@@ -1,4 +1,4 @@
-# v1.0
+# v0.1
 
 ## PHP>=5.6
 
@@ -29,45 +29,45 @@
  */  
 ```
 4. **支持GET或POST方式的参数传入：**
-    GET传入需要在方法上方的注解中加入相应的参数规则（必须使用别名，且只支持英文字母），并在方法参数中与之对应，如：
-    ```
-    /**
-     * @RequestMapping("/member/(?<name>\w{2,10})/(?<age>\d+)$",Method=GET);
-     */
-    function showUser($name, $age) {
-        echo 'name:'.$name.' age:'.$age;
+GET传入需要在方法上方的注解中加入相应的参数规则（必须使用别名，且只支持英文字母），并在方法参数中与之对应，如：
+```
+/**
+ * @RequestMapping("/member/(?<name>\w{2,10})/(?<age>\d+)$",Method=GET);
+ */
+function showUser($name, $age) {
+    echo 'name:'.$name.' age:'.$age;
+}
+```
+POST传入只需在方法中添加与POST对应且参数名相同的参数即可（如果某个POST值不存在参数列表中，则不会传入）如：
+```
+/**
+ * userLoginCheck()
+ * @RequestMapping("/loginCheck$",Method=POST);
+ */
+function userLoginCheck($uname, $upwd) {
+    $map['username'] = $uname;
+    $map['userpassword'] = $upwd;
+    echo json_encode($map);
+}
+```
+支持POST的自定义enctype格式（默认只支持application/json，其他类型可在start.php45行加入自定义解析规则），用其他MIME类型来取代默认的application/x-www-
+form-urlencoded，如AJAX请求：
+```
+$.ajax({
+    type: "POST",   
+    contentType: "application/json", //自定义类型，json
+    url: "/loginCheck",
+    data: JSON.stringify(userData), //格式：{paraName:paraValue}
+    dataType: 'json',
+    success: function (result) {     
+        alert(result.username);
+    },
+    error:function(response,error)
+    {
+        alert(error);
     }
-    ```
-    POST传入只需在方法中添加与POST对应且参数名相同的参数即可（如果某个POST值不存在参数列表中，则不会传入）如：
-    ```
-    /**
-     * userLoginCheck()
-     * @RequestMapping("/loginCheck$",Method=POST);
-     */
-    function userLoginCheck($uname, $upwd) {
-        $map['username'] = $uname;
-        $map['userpassword'] = $upwd;
-        echo json_encode($map);
-    }
-    ```
-    支持POST的自定义enctype格式（默认只支持application/json，其他类型可在start.php45行加入自定义解析规则），用其他MIME类型来取代默认的application/x-www-
-    form-urlencoded，如AJAX请求：
-   ```
-   $.ajax({
-        type: "POST",   
-        contentType: "application/json", //自定义类型，json
-        url: "/loginCheck",
-        data: JSON.stringify(userData), //格式：{paraName:paraValue}
-        dataType: 'json',
-        success: function (result) {     
-            alert(result.username);
-        },
-        error:function(response,error)
-        {
-        	alert(error);
-        }
-    });
-    ```
+});
+```
 5. **加载模板：在需要的控制器方法中添加参数$display即可调用模板，支持自定义传参，系统会自动加载vars和自定义变量，如：**
 ```
 /**
@@ -82,5 +82,5 @@ function showUser($name, $age, $display) {
 }
 ```
 
-## 未完成功能：
+## Other：
 1. 自定义ORM框架：Core/Orm/orm.php，目前只实现了简单的select、where、from的SQL语句拼接
